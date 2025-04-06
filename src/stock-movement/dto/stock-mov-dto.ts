@@ -4,9 +4,7 @@ import { PrimaryGeneratedColumn } from "typeorm"
 
 export class StockMovDto{
 
-   @PrimaryGeneratedColumn()
-    @IsNotEmpty()
-    id:number
+   
     
     @IsNotEmpty()
     productId:number
