@@ -13,7 +13,7 @@ export class StockMovementController {
     ){}
 
     @Post()
-
+    @UseGuards(JwtAuthGuard)
     createMovement(@Body() body: StockMovDto):Promise<StockMovement>{
         return this.stockMovService.moveStock(body);
     }
@@ -32,6 +32,7 @@ export class StockMovementController {
     }
 
     @Get(":id")
+    @UseGuards(JwtAuthGuard)
     trackMovement(
         @Param("id", new ParseIntPipe({errorHttpStatusCode:HttpStatus.NOT_ACCEPTABLE})) id: number
     ){
