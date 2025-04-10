@@ -15,6 +15,8 @@ import { Store } from './store/store.entity';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { User } from './user/user.entity';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [ConfigModule.forRoot(),
@@ -28,13 +30,15 @@ import { User } from './user/user.entity';
     synchronize:true,
     entities: [Product,StockMovement,StockQty,Store,User],
   }),
-  // TypeOrmModule.forRoot({
-  //   type: 'sqlite',
-  //   database: 'inventory.sqlite',
-  //   name: 'sqlite',
-  //   entities: [Product,StockMovement,StockQty],
-  //   synchronize: true, // Don't use in production!
-  // }),
+  ThrottlerModule.forRoot({
+    throttlers:[
+      {
+        ttl:60000,
+        limit:10
+      }
+    ]
+  })
+  ,
   ProductModule,
   StockMovementModule,
   StockQtyModule,
@@ -43,7 +47,10 @@ import { User } from './user/user.entity';
   AuthModule,
 ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService,{
+    provide:APP_GUARD,
+    useClass:ThrottlerGuard
+  }],
 })
 export class AppModule {
   constructor(private dataSource: DataSource) {
