@@ -1,4 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm"
+import { Product } from "src/product/product.entity"
+import { Store } from "src/store/store.entity";
+import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm"
 
 
 @Entity("StockMovement")
@@ -7,9 +9,9 @@ export class StockMovement{
     @PrimaryGeneratedColumn()
     id:number
 
-    @Column()
-
-    productId:number
+    @ManyToOne(() => Product, { eager: true })
+    @JoinColumn({ name: "productId" })
+    product: Product;
 
     @Column()
     type:String
@@ -26,4 +28,8 @@ export class StockMovement{
 
     @Column()
     createdBy:String
+
+    @ManyToOne(()=>Store,{eager:true})
+    @JoinColumn()
+    store: Store
 }

@@ -10,6 +10,9 @@ export class StockMovDto{
     productId:number
     
     @IsNotEmpty()
+    storeId:number
+    
+    @IsNotEmpty()
     
     type:String
    

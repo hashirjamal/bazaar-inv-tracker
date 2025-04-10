@@ -10,6 +10,11 @@ import { StockMovementModule } from './stock-movement/stock-movement.module';
 import { StockQtyModule } from './stock-qty/stock-qty.module';
 import { StockMovement } from './stock-movement/stock-movement.entity';
 import { StockQty } from './stock-qty/stock-qty.entity';
+import { StoreModule } from './store/store.module';
+import { Store } from './store/store.entity';
+import { UserModule } from './user/user.module';
+import { AuthModule } from './auth/auth.module';
+import { User } from './user/user.entity';
 
 @Module({
   imports: [ConfigModule.forRoot(),
@@ -21,18 +26,21 @@ import { StockQty } from './stock-qty/stock-qty.entity';
     password: process.env.PASSWORD,
     database: process.env.DB,
     synchronize:true,
-    entities:[]
+    entities: [Product,StockMovement,StockQty,Store,User],
   }),
-  TypeOrmModule.forRoot({
-    type: 'sqlite',
-    database: 'inventory.sqlite',
-    name: 'sqlite',
-    entities: [Product,StockMovement,StockQty],
-    synchronize: true, // Don't use in production!
-  }),
+  // TypeOrmModule.forRoot({
+  //   type: 'sqlite',
+  //   database: 'inventory.sqlite',
+  //   name: 'sqlite',
+  //   entities: [Product,StockMovement,StockQty],
+  //   synchronize: true, // Don't use in production!
+  // }),
   ProductModule,
   StockMovementModule,
   StockQtyModule,
+  StoreModule,
+  UserModule,
+  AuthModule,
 ],
   controllers: [AppController],
   providers: [AppService],

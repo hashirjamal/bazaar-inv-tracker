@@ -5,9 +5,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { StockMovement } from './stock-movement.entity';
 import { StockQty } from 'src/stock-qty/stock-qty.entity';
 import { Product } from 'src/product/product.entity';
+import { Store } from 'src/store/store.entity';
 
 @Module({
-  imports:[TypeOrmModule.forFeature([StockMovement,StockQty,Product],"sqlite")],
+  imports:[TypeOrmModule.forFeature([StockMovement,StockQty,Product,Store])],
   controllers: [StockMovementController],
   providers: [StockMovementService]
 })

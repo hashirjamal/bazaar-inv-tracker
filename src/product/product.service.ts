@@ -8,13 +8,13 @@ import { ProductDto } from './dto/product-dto';
 export class ProductService {
 
     constructor(
-        @InjectRepository(Product,"sqlite") private prodRepo : Repository<Product>
+        @InjectRepository(Product) private prodRepo : Repository<Product>
     ){
 
     }
 
     insertProduct(prodData : ProductDto):Promise<Product>{
-        let obj : any = {...prodData, createdAt:Date.now()}
+        let obj : any = {...prodData, createdAt:new Date()}
         return this.prodRepo.save(obj)
     }
 

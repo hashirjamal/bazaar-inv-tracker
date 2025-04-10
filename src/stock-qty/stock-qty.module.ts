@@ -5,7 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { StockQty } from './stock-qty.entity';
 
 @Module({
-  imports:[TypeOrmModule.forFeature([StockQty],"sqlite")],
+  imports:[TypeOrmModule.forFeature([StockQty])],
   providers: [StockQtyService],
   controllers: [StockQtyController]
 })

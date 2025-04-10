@@ -6,7 +6,7 @@ import { ProductService } from './product.service';
 
 
 @Module({
-    imports:[TypeOrmModule.forFeature([Product],'sqlite')],
+    imports:[TypeOrmModule.forFeature([Product])],
     providers:[ProductService],
   controllers: [ProductController],
   exports:[]
