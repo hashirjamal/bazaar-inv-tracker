@@ -17,6 +17,7 @@ import { AuthModule } from './auth/auth.module';
 import { User } from './user/user.entity';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
+import { EventsModule } from './events/events.module';
 
 @Module({
   imports: [ConfigModule.forRoot(),
@@ -45,6 +46,7 @@ import { APP_GUARD } from '@nestjs/core';
   StoreModule,
   UserModule,
   AuthModule,
+  EventsModule,
 ],
   controllers: [AppController],
   providers: [AppService,{

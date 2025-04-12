@@ -1,6 +1,12 @@
 import { IsNotEmpty } from "class-validator"
 import { PrimaryGeneratedColumn } from "typeorm"
 
+enum MovType{
+    STOCK_IN = "STOCK_IN",
+    SALE = "SALE",
+    MANUAL_REMOVAL = "MANUAL_REMOVAL"
+}
+
 
 export class StockMovDto{
 
@@ -14,7 +20,7 @@ export class StockMovDto{
     
     @IsNotEmpty()
     
-    type:String
+    type: MovType
    
     @IsNotEmpty()
     

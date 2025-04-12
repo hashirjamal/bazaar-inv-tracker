@@ -7,6 +7,7 @@ import { StockQty } from 'src/stock-qty/stock-qty.entity';
 import { StockMovDto } from './dto/stock-mov-dto';
 import { timestamp } from 'rxjs';
 import { Store } from 'src/store/store.entity';
+import { EventsGateway } from 'src/events/events.gateway';
 
 @Injectable()
 export class StockMovementService {
@@ -15,7 +16,8 @@ export class StockMovementService {
         @InjectRepository(Product) private prodRepo: Repository<Product>,
         @InjectRepository(StockMovement) private stockMovRepo: Repository<StockMovement>,
         @InjectRepository(StockQty) private stockQtyRepo: Repository<StockQty>,
-        @InjectRepository(Store) private storeRepo : Repository<Store>
+        @InjectRepository(Store) private storeRepo : Repository<Store>,
+        private eventsGateway : EventsGateway
     ){    }
 
 
@@ -69,7 +71,14 @@ export class StockMovementService {
                         }
 
                         stock.lastUpdated= new Date()
-                        this.stockQtyRepo.update(stockBody.productId,stock)
+                        await   this.stockQtyRepo.update(stockBody.productId,stock)
+                        const qty = await this.stockQtyRepo.findOneBy({productId:prod[0]})
+
+                        
+                        if(qty && qty.currentQuantity<10){
+                            this.eventsGateway.emitEvent('lowStock',{message:"Low stock",qty})
+                        }
+
                 return stockMov;
             }
             
