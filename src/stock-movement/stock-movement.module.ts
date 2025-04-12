@@ -8,9 +8,12 @@ import { Product } from 'src/product/product.entity';
 import { Store } from 'src/store/store.entity';
 import { EventsGateway } from 'src/events/events.gateway';
 import { EventsModule } from 'src/events/events.module';
+import { CacheModule } from '@nestjs/cache-manager';
+
+
 
 @Module({
-  imports:[TypeOrmModule.forFeature([StockMovement,StockQty,Product,Store]),EventsModule],
+  imports:[TypeOrmModule.forFeature([StockMovement,StockQty,Product,Store]),EventsModule,],
   controllers: [StockMovementController],
   providers: [StockMovementService]
 })

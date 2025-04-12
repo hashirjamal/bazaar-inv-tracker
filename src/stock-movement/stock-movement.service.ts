@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from 'src/product/product.entity';
 import { Between, Equal, Repository } from 'typeorm';
@@ -8,6 +8,8 @@ import { StockMovDto } from './dto/stock-mov-dto';
 import { timestamp } from 'rxjs';
 import { Store } from 'src/store/store.entity';
 import { EventsGateway } from 'src/events/events.gateway';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 
 @Injectable()
 export class StockMovementService {
@@ -17,7 +19,8 @@ export class StockMovementService {
         @InjectRepository(StockMovement) private stockMovRepo: Repository<StockMovement>,
         @InjectRepository(StockQty) private stockQtyRepo: Repository<StockQty>,
         @InjectRepository(Store) private storeRepo : Repository<Store>,
-        private eventsGateway : EventsGateway
+        private eventsGateway : EventsGateway,
+        @Inject(CACHE_MANAGER) private cacheMngr : Cache
     ){    }
 
 
@@ -75,9 +78,11 @@ export class StockMovementService {
                         const qty = await this.stockQtyRepo.findOneBy({productId:prod[0]})
 
                         
-                        if(qty && qty.currentQuantity<10){
-                            this.eventsGateway.emitEvent('lowStock',{message:"Low stock",qty})
-                        }
+                        setImmediate(()=>{
+                                if(qty && qty.currentQuantity<10){
+                                    this.eventsGateway.emitEvent('lowStock',{message:"Low stock",qty})
+                                }
+                            })
 
                 return stockMov;
             }
@@ -105,33 +110,48 @@ export class StockMovementService {
             }
             
 
-    fetchAllMov(page: number,limit:number,store:number,date:string | null): Promise<StockMovement[]>{
+    async fetchAllMov(page: number,limit:number,store:number,date:string | null): Promise<StockMovement[]>{
 
         let skip = (page-1)*limit
         let take = limit>100 ? 100 : limit
 
         let options = {}
-
+        
+        let key = `stock:`
         if(store>0){
             options['store'] = Equal(store)
+            key+=`store:${store}`
         }
-
+        
         if(date){
             let range = date.split(",")
             if(range.length==1){
                 let dt = new Date(range[0])
                 options['timestamp'] = Equal(dt)
+                key+=`date:${dt}`
             }
             else{
                 let dt1 = new Date(range[0])
                 let dt2 = new Date(range[1])
-
+                
+                key+=`date:${dt1}:${dt2}`
                 options['timestamp'] = Between(dt1,dt2)
             }
         }
 
+        const value:StockMovement[] | null = await this.cacheMngr.get(key)
 
-        return this.stockMovRepo.find({where:options,skip,take,order:{id:'ASC'}});    
+        if(value) {
+            
+            console.log("CACHED-->",value)
+            return value;
+        }
+
+        const res = await this.stockMovRepo.find({where:options,skip,take,order:{id:'ASC'}});
+
+        await this.cacheMngr.set(key,res)
+
+        return res;    
     }
 
     fetchOneMov(id:number): Promise<StockMovement | null>{

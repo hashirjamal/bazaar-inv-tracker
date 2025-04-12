@@ -18,6 +18,9 @@ import { User } from './user/user.entity';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { EventsModule } from './events/events.module';
+import { CacheModule } from '@nestjs/cache-manager';
+import * as redisStore from "cache-manager-redis-store"
+
 
 @Module({
   imports: [ConfigModule.forRoot(),
@@ -38,6 +41,14 @@ import { EventsModule } from './events/events.module';
         limit:10
       }
     ]
+  })
+  ,
+  CacheModule.register({
+    ttl:10000,
+    host:'localhost',
+    store:redisStore,
+    isGlobal:true 
+  
   })
   ,
   ProductModule,
